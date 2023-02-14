@@ -1,5 +1,3 @@
-# Sample code from the TorchVision 0.3 Object Detection Finetuning Tutorial
-# http://pytorch.org/tutorials/intermediate/torchvision_tutorial.html
 
 import os
 import numpy as np
@@ -16,7 +14,7 @@ import utils
 import transforms as T
 
 
-class PennFudanDataset(object):
+class PFDataset(object):
     def __init__(self, root, transforms):
         self.root = root
         self.transforms = transforms
@@ -117,8 +115,8 @@ def main():
     # our dataset has two classes only - background and person
     num_classes = 2
     # use our dataset and defined transformations
-    dataset = PennFudanDataset('PennFudanPed', get_transform(train=True))
-    dataset_test = PennFudanDataset('PennFudanPed', get_transform(train=False))
+    dataset = PFDataset('PennFudanPed', get_transform(train=True))
+    dataset_test = PFDataset('PennFudanPed', get_transform(train=False))
 
     # split the dataset in train and test set
     indices = torch.randperm(len(dataset)).tolist()
