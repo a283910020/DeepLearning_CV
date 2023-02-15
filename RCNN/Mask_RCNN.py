@@ -1,4 +1,4 @@
-
+# written for mask_rcnn project
 import os
 import numpy as np
 import torch
@@ -87,7 +87,7 @@ def get_model_instance_segmentation(num_classes):
 
     # get number of input features for the classifier
     in_features = model.roi_heads.box_predictor.cls_score.in_features
-    # replace the pre-trained head with a new one
+    # replace the pre-trained head with Fast-RCNN Predictor
     model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
 
     # now get the number of input features for the mask classifier
@@ -108,7 +108,7 @@ def get_transform(train):
     return T.Compose(transforms)
 
 
-def main():
+def run():
     # train on the GPU or on the CPU, if a GPU is not available
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
@@ -162,4 +162,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    run()
