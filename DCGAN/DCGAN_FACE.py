@@ -27,7 +27,6 @@ class Generator(nn.Module):
     def __init__(self):
         super(Generator, self).__init__()
         self.model = nn.Sequential(
-            # 输入是Z，输入到卷积层
             nn.ConvTranspose2d(bias_size, G_feature_size * 8, 4, 1, 0, bias=False),
             nn.BatchNorm2d(G_feature_size * 8),
             nn.ReLU(inplace=True),
@@ -130,7 +129,6 @@ if __name__ == '__main__':
         for i, data in enumerate(dataloader):
             # update D: maximum log(D(x)) + log(1 - D(G(z)))
             netD.zero_grad()
-            # 格式化训练批
             single_batch_size = data[0].size(0)
             label = torch.full((single_batch_size,), real_label, dtype=torch.float)
             output = netD(data[0]).view(-1)
