@@ -24,8 +24,8 @@ if __name__ == '__main__':
     width, height, n_len = 192, 64, 4
     print(characters, width, height, n_len)
 
-    for i in range(1000):
+    for i in range(10000):
         img_generator(width, height, characters, "train")
-    for i in range(100):
-        img_generator(width, height, characters, "test")
+    for i in range(1000):
+        img_generator(width, height, characters, "valid")
 

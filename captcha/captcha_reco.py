@@ -1,10 +1,11 @@
 ## written by ChenZhuo for captcha recognization
-
+import os
 import string
 import torch
+from PIL import Image
 from torch.utils.data import Dataset, DataLoader
 from torchvision.transforms.functional import to_tensor, to_pil_image
-from torchvision import transforms
+import torchvision.transforms as T
 import torchvision.datasets as dset
 import torch
 import torch.nn as nn
@@ -130,7 +131,7 @@ def valid(model, optimizer, epoch, dataloader):
 
 
 class CaptchaDataset(Dataset):
-    def __init__(self, characters, length, width, height, input_length, label_length):
+    def __init__(self, characters, length, width, height, input_length, label_length, img_path):
         super(CaptchaDataset, self).__init__()
         self.characters = characters
         self.length = length
@@ -140,14 +141,21 @@ class CaptchaDataset(Dataset):
         self.label_length = label_length
         self.n_class = len(characters)
         self.generator = ImageCaptcha(width=width, height=height)
+        input_list = [i for i in os.listdir(img_path) if i.endswith(".jpg")]
+        print(input_list)
+        self.img = [os.path.join(img_path, i) for i in input_list]
+        self.target = [i.split(".")[0] for i in input_list]
+
 
     def __len__(self):
         return self.length
 
     def __getitem__(self, index):
         random_str = ''.join([random.choice(self.characters[1:]) for j in range(self.label_length)])
-        image = to_tensor(self.generator.generate_image(random_str))
-        target = torch.tensor([self.characters.find(x) for x in random_str], dtype=torch.long)
+        # image = to_tensor(self.generator.generate_image(random_str))
+        # target = torch.tensor([self.characters.find(x) for x in random_str], dtype=torch.long)
+        image = to_tensor(Image.open(self.img[index]))
+        target = torch.tensor([self.characters.find(x) for x in self.target[index]], dtype=torch.long)
         input_length = torch.full(size=(1,), fill_value=self.input_length, dtype=torch.long)
         target_length = torch.full(size=(1,), fill_value=self.label_length, dtype=torch.long)
         # print(image, target, input_length, target_length)
@@ -174,11 +182,11 @@ if __name__ == '__main__':
     optimizer = torch.optim.Adam(model.parameters(), 1e-3, amsgrad=True)
     epochs = 10
     batch_size = 128
-
-    train_set = CaptchaDataset(characters, 100, width, height, 12, n_len)
-    valid_set = CaptchaDataset(characters, 10, width, height, 12, n_len)
-    train_loader = DataLoader(train_set, batch_size=batch_size)
-    valid_loader = DataLoader(valid_set, batch_size=batch_size)
+    n_input_length = 12
+    train_set = CaptchaDataset(characters, 10000, width, height, n_input_length, n_len, "data/train")
+    valid_set = CaptchaDataset(characters, 1000, width, height, n_input_length, n_len, "data/valid")
+    train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True)
+    valid_loader = DataLoader(valid_set, batch_size=batch_size, shuffle=False)
     for epoch in range(1, epochs + 1):
         train(model, optimizer, epoch, train_loader)
         valid(model, optimizer, epoch, valid_loader)
