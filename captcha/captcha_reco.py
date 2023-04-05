@@ -15,6 +15,7 @@ import numpy as np
 from tqdm import tqdm
 from captcha.image import ImageCaptcha
 import random
+from torchsummary import summary
 
 
 class Model(nn.Module):
@@ -41,7 +42,7 @@ class Model(nn.Module):
         modules[f'dropout'] = nn.Dropout(0.25, inplace=True)
 
         self.cnn = nn.Sequential(modules)
-        self.lstm = nn.LSTM(input_size=self.infer_features(), hidden_size=128, num_layers=2, bidirectional=True)
+        self.lstm = nn.LSTM(input_size=self.infer_features(), hidden_size=128, num_layers=2, bidirectional=True, dropout=0.2)
         self.fc = nn.Linear(in_features=256, out_features=n_classes)
 
     def infer_features(self):
@@ -165,31 +166,22 @@ class CaptchaDataset(Dataset):
 if __name__ == '__main__':
     characters = '-' + string.digits + string.ascii_uppercase
     width, height, n_len, n_classes = 192, 64, 4, len(characters)
-    dataroot = "./data"
-
-    # dataset = dset.ImageFolder(root=dataroot)
-    # print(dataset)
-    # indices = torch.randperm(len(dataset)).tolist()
-    # dataset_train = torch.utils.data.Subset(dataset, indices[:1000])  # too large for full size
-    # dataset_test = torch.utils.data.Subset(dataset, indices[1000:])
-    #
-    # dataloader_train = torch.utils.data.DataLoader(dataset_train, batch_size=batch_size, shuffle=True)
-    # dataloader_test = torch.utils.data.DataLoader(dataset_test, batch_size=batch_size, shuffle=False)
 
     model = Model(n_classes, input_shape=(3, height, width))
     print(model)
+    summary(model, (3, 64, 192), batch_size=128, device="cpu")
 
-    optimizer = torch.optim.Adam(model.parameters(), 1e-3, amsgrad=True)
-    epochs = 10
-    batch_size = 128
-    n_input_length = 12
-    train_set = CaptchaDataset(characters, 10000, width, height, n_input_length, n_len, "data/train")
-    valid_set = CaptchaDataset(characters, 1000, width, height, n_input_length, n_len, "data/valid")
-    train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True)
-    valid_loader = DataLoader(valid_set, batch_size=batch_size, shuffle=False)
-    for epoch in range(1, epochs + 1):
-        train(model, optimizer, epoch, train_loader)
-        valid(model, optimizer, epoch, valid_loader)
+    # optimizer = torch.optim.Adam(model.parameters(), 1e-3, amsgrad=True)
+    # epochs = 10
+    # batch_size = 128
+    # n_input_length = 12
+    # train_set = CaptchaDataset(characters, 10000, width, height, n_input_length, n_len, "data/train")
+    # valid_set = CaptchaDataset(characters, 1000, width, height, n_input_length, n_len, "data/valid")
+    # train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True)
+    # valid_loader = DataLoader(valid_set, batch_size=batch_size, shuffle=False)
+    # for epoch in range(1, epochs + 1):
+    #     train(model, optimizer, epoch, train_loader)
+    #     valid(model, optimizer, epoch, valid_loader)
 
 
 

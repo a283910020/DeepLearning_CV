@@ -110,7 +110,7 @@ if __name__ == '__main__':
     dataset = torch.utils.data.Subset(dataset, indices[:150])  # too large for full size
 
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=workers)
-    # device = torch.device("cpu")
+    device = torch.device("cpu")
 
     netG = Generator().apply(weights_init)
     netD = Discriminator().apply(weights_init)
