@@ -113,7 +113,7 @@ def run():
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
     # our dataset has two classes only - background and person
-    num_classes = 2
+    num_classes = 4
     # use our dataset and defined transformations
     dataset = PFDataset('PennFudanPed', get_transform(train=True))
     dataset_test = PFDataset('PennFudanPed', get_transform(train=False))
