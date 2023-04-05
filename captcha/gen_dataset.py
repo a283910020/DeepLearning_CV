@@ -21,7 +21,7 @@ def img_generator(width, height, characters, train_test):
 if __name__ == '__main__':
 
     characters = string.digits + string.ascii_uppercase
-    width, height, n_len = 192, 64, 4
+    width, height, n_len = 192, 64, 44444
     print(characters, width, height, n_len)
 
     for i in range(10000):
