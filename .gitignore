@@ -1,3 +1,5 @@
 .gitignore
 Seq2Seq_attention/fra-eng
 DCGAN/data
+.idea
+VIT/data/*
