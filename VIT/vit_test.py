@@ -6,6 +6,7 @@ import torch.optim as optim
 from torch import nn
 import torch
 from vit_pytorch import ViT
+from torchvision.models.vision_transformer import vit_b_16 as vit_model
 
 import cv2
 from PIL import Image
@@ -36,9 +37,9 @@ def image_crop():
             print(folder, img, end="  ")
             image = cv2.imread(os.path.join(src_folder, folder, img))
             print(image.shape, end="  ")
-            img_crop = box_crop(image)
+            img_crop = box_crop(image, 224)
             print(img_crop.shape)
-            dest = os.path.join(dest_folder, folder)
+            dest = os.path.join(dest_folder, folder[:-1], folder)
             if not os.path.isdir(dest):
                 os.makedirs(dest)
             cv2.imwrite(os.path.join(dest, img), img_crop)
@@ -125,27 +126,35 @@ def test_loop(dataloader, model, loss_fn):
 
 
 if __name__ == '__main__':
-    # image_crop()
+    image_crop()
 
     device = torch.device("mps")
 
     batch_size = 256
     num_workers = 4
     lr = 1e-4
-    epochs = 5
+    epochs = 1
 
-    model = ViT(
-        image_size=256,
-        patch_size=32,
-        num_classes=2,
-        dim=1024,
-        depth=6,
-        heads=16,
-        mlp_dim=2048,
-        dropout=0.1,
-        emb_dropout=0.1
-    )
+    # model = ViT(
+    #     image_size=256,
+    #     patch_size=32,
+    #     num_classes=2,
+    #     dim=1024,
+    #     depth=6,
+    #     heads=16,
+    #     mlp_dim=2048,
+    #     dropout=0.1,
+    #     emb_dropout=0.1
+    # )
+
+    model = vit_model(pretrained=True)
     print(model)
+    in_feature = model.heads.head.in_features
+    print(in_feature)
+    # fc_in_feature = model.heads.in_features
+    model.heads.head = nn.Linear(in_features=in_feature, out_features=2)
+    print(model)
+    # exit(0)
     model = model.to(device)
     train_loader, test_loader = build_dataset()
     print(len(train_loader), len(test_loader))
